@@ -9,23 +9,24 @@
 import UIKit
 
 protocol CAMembersViewControllerDelegate: class {
-    func persistMemberFavouriteList(indexPath: String,membersList:[Model.members])
+    func persistMemberFavouriteList(indexPath: String,membersList:[Member])
 }
 
 class CAMembersViewController: UIViewController,UITableViewDelegate,UITableViewDataSource,UISearchResultsUpdating {
     
-    var membersListArray = [Model.members]()
-    var filteredMembers = [Model.members]()
+    var MembersListArray = [Member]()
+    var filteredMembersList = [Member]()
     weak var delegate: CAMembersViewControllerDelegate?
     let searchController = UISearchController(searchResultsController: nil)
     @IBOutlet weak var memberTableView: UITableView!
     var companyIndexPathLbl = String()
     
+    
     //MARK: UIApplication Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+    
         // Do any additional setup after loading the view.
         uiConfig()
     }
@@ -35,7 +36,7 @@ class CAMembersViewController: UIViewController,UITableViewDelegate,UITableViewD
     func uiConfig(){
         self.memberTableView.delegate = self
         self.memberTableView.dataSource = self
-        filteredMembers = membersListArray
+        filteredMembersList = MembersListArray
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
@@ -47,11 +48,11 @@ class CAMembersViewController: UIViewController,UITableViewDelegate,UITableViewD
     func updateSearchResults(for searchController: UISearchController) {
         // If we haven't typed anything into the search bar then do not filter the results
         if searchController.searchBar.text! == "" {
-            filteredMembers = membersListArray
+            filteredMembersList = MembersListArray
         }
         else {
             // Filter the results
-            filteredMembers = membersListArray.filter { $0.name.lowercased().contains(searchController.searchBar.text!.lowercased()) }
+            filteredMembersList = MembersListArray.filter { ($0.name?.first.lowercased().contains(searchController.searchBar.text!.lowercased()))!}
         }
         self.memberTableView.reloadData()
     }
@@ -64,12 +65,14 @@ class CAMembersViewController: UIViewController,UITableViewDelegate,UITableViewD
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CAMembersListTableViewCellIdentifier", for: indexPath) as! CAMembersListTableViewCell
-        cell.memberNameLbl?.text = self.filteredMembers[indexPath.section].name
-        cell.memberAgeLbl?.text = String(self.filteredMembers[indexPath.section].age)
-        cell.memberMailLbl?.text = self.filteredMembers[indexPath.section].email
-        cell.memberPhoneNoLbl?.text = String(self.filteredMembers[indexPath.section].number)
         
-            if(self.filteredMembers[indexPath.section].isMemberFavourite == "Yes"){
+        let name = (self.filteredMembersList[indexPath.section].name?.first)! + " " + (self.filteredMembersList[indexPath.section].name?.last)!
+        cell.memberNameLbl?.text = name
+        cell.memberAgeLbl?.text = String(self.filteredMembersList[indexPath.section].age)
+        cell.memberMailLbl?.text = self.filteredMembersList[indexPath.section].email
+        cell.memberPhoneNoLbl?.text = String(self.filteredMembersList[indexPath.section].phone)
+        
+            if(self.filteredMembersList[indexPath.section].isMemberFavourite == "Yes"){
                 cell.isFavourite.isSelected = true
             }
             else{
@@ -97,23 +100,23 @@ class CAMembersViewController: UIViewController,UITableViewDelegate,UITableViewD
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return self.filteredMembers.count
+        return self.filteredMembersList.count
     }
     
     //MARK: IBActions
     
     @IBAction func ascendingAction(_ sender: Any) {
-        self.filteredMembers.sort{$0.name < $1.name}
+        self.filteredMembersList.sort{$0.name!.first < $1.name!.first}
         self.memberTableView.reloadData()
     }
     
     @IBAction func descendingAction(_ sender: Any) {
-        self.filteredMembers.sort{$0.name > $1.name}
+        self.filteredMembersList.sort{$0.name!.first > $1.name!.first}
         self.memberTableView.reloadData()
     }
     
     @IBAction func BackAction(_ sender: Any) {
-        delegate?.persistMemberFavouriteList(indexPath: companyIndexPathLbl,membersList: self.filteredMembers)
+        delegate?.persistMemberFavouriteList(indexPath: companyIndexPathLbl,membersList: self.filteredMembersList)
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -121,11 +124,11 @@ class CAMembersViewController: UIViewController,UITableViewDelegate,UITableViewD
     
     @objc func isFavouriteAction(_ button: UIButton)
     {
-        if(self.filteredMembers[button.tag].isMemberFavourite == "Yes"){
-            self.filteredMembers[button.tag].isMemberFavourite = "No"
+        if(self.filteredMembersList[button.tag].isMemberFavourite == "Yes"){
+            self.filteredMembersList[button.tag].isMemberFavourite = "No"
         }
         else{
-            self.filteredMembers[button.tag].isMemberFavourite = "Yes"
+            self.filteredMembersList[button.tag].isMemberFavourite = "Yes"
         }
         self.memberTableView.reloadData()
         

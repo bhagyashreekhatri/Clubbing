@@ -4,7 +4,7 @@
 //
 //  Created by Bhagyashree Haresh Khatri on 08/02/2019.
 //  Copyright © 2019 Bhagyashree Haresh Khatri. All rights reserved.
-//
+
 
 import UIKit
 
@@ -16,7 +16,7 @@ class CACompanyListTableViewCell: UITableViewCell {
     @IBOutlet weak var companyNameLbl: UILabel!
     @IBOutlet weak var isFavourite: UIButton!
     @IBOutlet weak var isFollowingBtn: UIButton!
-    @IBOutlet weak var companyIndexPathLbl: UILabel!
+
     
     override func awakeFromNib() {
         super.awakeFromNib()
